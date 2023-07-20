@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { QueryResult } from 'pg';
 
 const pool = new Pool({
-  host: 'localhost', // Utilizza il nome del servizio Docker come hostname
+  host: 'localhost',
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PW,
   database: process.env.POSTGRES_DB,
@@ -25,14 +25,14 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
       [tableName]
     );
 
-    // La query restituirà un oggetto con la chiave 'exists' che sarà un booleano
+    // This query returns an obj with a boolean "exists" key
     return queryResult.rows[0].exists;
   } finally {
     client.release();
   }
 };
 
-// Creazione Tables
+// Tables creation handler
 (async () => {
   const client = await pool.connect();
   try {
@@ -79,7 +79,7 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
   }
 })();
 
-// Funzione 
+// Database operations handler
 export const query = async (
   text: string,
   values?: any[]
