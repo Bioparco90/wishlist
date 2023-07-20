@@ -38,7 +38,7 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
   try {
     const userTableCheck = await checkIfTableExists('users');
     const wishlistsTableCheck = await checkIfTableExists('wishlists');
-    const wishlistsItemsTableCheck = await checkIfTableExists('wishlistsItems');
+    const wishlistsItemsTableCheck = await checkIfTableExists('wishlistitems');
 
     if (!userTableCheck) {
       const userQuery = `CREATE TABLE Users (

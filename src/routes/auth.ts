@@ -25,7 +25,7 @@ auth.post('/register', async (req, res) => {
   const queryValues = [user_id, username, email, hashedPassword];
 
   try {
-    const result = await query(queryString, queryValues);
+    await query(queryString, queryValues);
     res.json({ message: 'User registered' });
   } catch (e) {
     res.json({ error_message: (e as Error).message });
