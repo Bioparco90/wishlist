@@ -1,16 +1,17 @@
-import { Router } from 'express';
+import { Response, NextFunction, Router, Request } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { query } from '../db/db-utility';
+import { User } from '../types/types';
 
 const auth = Router();
 const secretKey = crypto.randomBytes(32).toString('hex');
 
 // Returns the token
-const generateToken = (user_id: string): string => {
-  return jwt.sign({ user_id }, secretKey, { expiresIn: '1h' });
+const generateToken = (user: User): string => {
+  return jwt.sign({ ...user }, secretKey, { expiresIn: '1h' });
 };
 
 const checkPassword = async (
@@ -18,6 +19,27 @@ const checkPassword = async (
   hashed: string
 ): Promise<boolean> => {
   return await bcrypt.compare(password, hashed);
+};
+
+// Auth verify middleware
+export const authenticateToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.cookies['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  jwt.verify(token, secretKey, (err: any, _user: any) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+    next();
+  });
 };
 
 // Route = /auth
@@ -49,7 +71,11 @@ auth.post('/login', async (req, res) => {
     });
   }
 
-  res.json({ verified: verified, type: typeof user.user_id });
+  const { password: pw, ...rest } = user;
+  const token = generateToken(rest);
+  res.cookie('authorization', `Bearer ${token}`);
+
+  res.json({ token: token, data: rest });
 });
 
 auth.post('/register', async (req, res) => {
