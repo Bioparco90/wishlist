@@ -44,7 +44,7 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
       const userQuery = `CREATE TABLE Users (
         user_id UUID DEFAULT '${uuidv4()}' PRIMARY KEY,
         username VARCHAR(100) NOT NULL UNIQUE,
-        email VARCHAR(255),
+        email VARCHAR(255) UNIQUE,
         password VARCHAR(100) NOT NULL
       );`;
       await client.query(userQuery);
