@@ -2,12 +2,11 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
-import crypto, { randomFillSync } from 'crypto';
+import crypto from 'crypto';
 import { query } from '../db/db-utility';
 
 const auth = Router();
 const secretKey = crypto.randomBytes(32).toString('hex');
-randomFillSync;
 
 // Returns the token
 const generateToken = (user_id: string): string => {
