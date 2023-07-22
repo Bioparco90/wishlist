@@ -23,4 +23,9 @@ app.get('/login', (_req, res) => {
   res.sendFile(filePath);
 });
 
+app.get('/logout', authenticateToken, (req, res) => {
+  const filePath = path.join(__dirname, '../logout.html');
+  res.sendFile(filePath);
+});
+
 app.listen(port, () => console.log(`Server running on port ${port}`));

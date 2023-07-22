@@ -36,7 +36,7 @@ export const authenticateToken = (
 
   jwt.verify(token, secretKey, (err: any, _user: any) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.sendStatus(403).json({error: "Forbidden"});
     }
     next();
   });
@@ -76,6 +76,11 @@ auth.post('/login', async (req, res) => {
   res.cookie('authorization', `Bearer ${token}`);
 
   res.json({ token: token, data: rest });
+});
+
+auth.post('/logout', (req, res) => {
+  res.cookie('authorization', '', { expires: new Date(0) });
+  res.json({message: "User disconnected."})
 });
 
 auth.post('/register', async (req, res) => {
