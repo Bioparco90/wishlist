@@ -7,7 +7,7 @@ import { query } from '../db/db-utility';
 import { User } from '../types/types';
 
 const auth = Router();
-const secretKey = crypto.randomBytes(32).toString('hex');
+const secretKey = process.env.SECRET_KEY || crypto.randomBytes(32).toString('hex');
 
 // Returns the token
 const generateToken = (user: User): string => {
