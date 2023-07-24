@@ -38,7 +38,7 @@ export const authenticateToken = (
     if (err) {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    const {iat, exp, ...rest} = user;
+    const { iat, exp, ...rest } = user;
     req.body.userData = rest;
     next();
   });
@@ -66,7 +66,7 @@ auth.post('/login', async (req, res) => {
   }
 
   // Password check
-  const verified = await checkPassword(password, user.password || '');
+  const verified = await checkPassword(password, user.password);
   if (!verified) {
     return res.status(401).json({
       message: 'Problem with authentication. Please check your password',
