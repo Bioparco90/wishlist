@@ -34,10 +34,12 @@ export const authenticateToken = (
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  jwt.verify(token, secretKey, (err: any, _user: any) => {
+  jwt.verify(token, secretKey, (err: any, user: any) => {
     if (err) {
-      return res.sendStatus(403).json({error: "Forbidden"});
+      return res.status(403).json({ error: 'Forbidden' });
     }
+    const {iat, exp, ...rest} = user;
+    req.body.userData = rest;
     next();
   });
 };
@@ -80,7 +82,7 @@ auth.post('/login', async (req, res) => {
 
 auth.post('/logout', (req, res) => {
   res.cookie('authorization', '', { expires: new Date(0) });
-  res.json({message: "User disconnected."})
+  res.json({ message: 'User disconnected.' });
 });
 
 auth.post('/register', async (req, res) => {
