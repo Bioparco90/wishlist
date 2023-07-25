@@ -7,27 +7,19 @@ import { query } from '../db/db-utility';
 import { User } from '../types/types';
 
 const auth = Router();
-const secretKey =
-  process.env.SECRET_KEY || crypto.randomBytes(32).toString('hex');
+const secretKey = process.env.SECRET_KEY || crypto.randomBytes(32).toString('hex');
 
 // Returns the token
 const generateToken = (user: User): string => {
   return jwt.sign({ ...user }, secretKey, { expiresIn: '1h' });
 };
 
-const checkPassword = async (
-  password: string = '',
-  hashed: string = ''
-): Promise<boolean> => {
+const checkPassword = async (password: string = '', hashed: string = ''): Promise<boolean> => {
   return await bcrypt.compare(password, hashed);
 };
 
 // Auth verify middleware
-export const authenticateToken = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.cookies['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 

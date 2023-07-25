@@ -79,10 +79,7 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
 })();
 
 // Database operations handler
-export const query = async (
-  text: string,
-  values?: any[]
-): Promise<QueryResult> => {
+export const query = async (text: string, values?: any[]): Promise<QueryResult> => {
   const client = await pool.connect();
   try {
     return await client.query(text, values);

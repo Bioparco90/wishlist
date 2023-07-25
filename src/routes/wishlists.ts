@@ -24,8 +24,7 @@ wishlists.get('/', authenticateToken, async (req, res) => {
 wishlists.get('/:listId', authenticateToken, async (req, res) => {
   const { listId } = req.params;
   const { user_id } = req.body.userData;
-  const queryString =
-    'SELECT * FROM wishlists WHERE wishlist_id=$1 AND user_id=$2';
+  const queryString = 'SELECT * FROM wishlists WHERE wishlist_id=$1 AND user_id=$2';
   const queryValues = [listId, user_id];
   try {
     const { rows, rowCount } = await query(queryString, queryValues);
@@ -44,8 +43,7 @@ wishlists.post('/', authenticateToken, async (req, res) => {
   const { user_id } = req.body.userData;
   const { name } = req.body;
   const wishlist_id = uuidv4();
-  const queryString =
-    'INSERT INTO wishlists(wishlist_id, user_id, name) VALUES ($1, $2, $3)';
+  const queryString = 'INSERT INTO wishlists(wishlist_id, user_id, name) VALUES ($1, $2, $3)';
   const queryValues = [wishlist_id, user_id, name];
   try {
     await query(queryString, queryValues);
@@ -59,8 +57,7 @@ wishlists.put('/:listId', authenticateToken, async (req, res) => {
   const { user_id } = req.body.userData;
   const { name } = req.body;
   const { listId } = req.params;
-  const queryString =
-    'UPDATE wishlists SET name=$1, updated_at=NOW() WHERE user_id=$2 AND wishlist_id=$3';
+  const queryString = 'UPDATE wishlists SET name=$1, updated_at=NOW() WHERE user_id=$2 AND wishlist_id=$3';
   const queryValues = [name, user_id, listId];
   try {
     await query(queryString, queryValues);
@@ -73,8 +70,7 @@ wishlists.put('/:listId', authenticateToken, async (req, res) => {
 wishlists.delete('/:listId', authenticateToken, async (req, res) => {
   const { user_id } = req.body.userData;
   const { listId } = req.params;
-  const queryString =
-    'DELETE FROM wishlists WHERE user_id=$1 AND wishlist_id=$2';
+  const queryString = 'DELETE FROM wishlists WHERE user_id=$1 AND wishlist_id=$2';
   const queryValues = [user_id, listId];
   try {
     const { rowCount } = await query(queryString, queryValues);
