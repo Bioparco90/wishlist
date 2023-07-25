@@ -55,7 +55,6 @@ wishlists.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-//PUT /wishlists/:id: Modifica una lista dei desideri esistente (autenticazione richiesta).
 wishlists.put('/:listId', authenticateToken, async (req, res) => {
   const { user_id } = req.body.userData;
   const { name } = req.body;
@@ -69,7 +68,6 @@ wishlists.put('/:listId', authenticateToken, async (req, res) => {
   } catch (e) {
     res.json({ error_message: (e as Error).message });
   }
-
 });
 
 export default wishlists;
