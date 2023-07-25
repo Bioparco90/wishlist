@@ -70,7 +70,6 @@ wishlists.put('/:listId', authenticateToken, async (req, res) => {
   }
 });
 
-// DELETE /wishlists/:id: Elimina una lista dei desideri esistente (autenticazione richiesta).
 wishlists.delete('/:listId', authenticateToken, async (req, res) => {
   const { user_id } = req.body.userData;
   const { listId } = req.params;
