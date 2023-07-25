@@ -10,8 +10,8 @@ wishlists.get('/', authenticateToken, async (req, res) => {
   const queryString = 'SELECT * FROM wishlists WHERE user_id=$1';
   const queryValues = [user_id];
   try {
-    const { rows } = await query(queryString, queryValues);
-    if (rows.length === 0) {
+    const { rows, rowCount } = await query(queryString, queryValues);
+    if (rowCount === 0) {
       res.status(404);
       throw new Error('List not found');
     }
@@ -28,8 +28,8 @@ wishlists.get('/:listId', authenticateToken, async (req, res) => {
     'SELECT * FROM wishlists WHERE wishlist_id=$1 AND user_id=$2';
   const queryValues = [listId, user_id];
   try {
-    const { rows } = await query(queryString, queryValues);
-    if (rows.length === 0) {
+    const { rows, rowCount } = await query(queryString, queryValues);
+    if (rowCount === 0) {
       res.status(404);
       throw new Error('List not found');
     }
@@ -65,6 +65,22 @@ wishlists.put('/:listId', authenticateToken, async (req, res) => {
   try {
     await query(queryString, queryValues);
     res.json({ message: 'Wishlist updated' });
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+});
+
+// DELETE /wishlists/:id: Elimina una lista dei desideri esistente (autenticazione richiesta).
+wishlists.delete('/:listId', authenticateToken, async (req, res) => {
+  const { user_id } = req.body.userData;
+  const { listId } = req.params;
+  const queryString =
+    'DELETE FROM wishlists WHERE user_id=$1 AND wishlist_id=$2';
+  const queryValues = [user_id, listId];
+  try {
+    const { rowCount } = await query(queryString, queryValues);
+    if (rowCount === 0) return res.json({ message: 'Nothing to delete' });
+    res.json({ message: 'Wishlist deleted' });
   } catch (e) {
     res.json({ error_message: (e as Error).message });
   }
