@@ -1,7 +1,7 @@
 import express from 'express';
 import 'dotenv/config';
 import auth, { authenticateToken } from './routes/auth';
-import wishlist from './routes/wishlist';
+import wishlists from './routes/wishlists';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 
@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/auth', auth);
-app.use('/wishlist', wishlist);
+app.use('/wishlists', wishlists);
 
 // Test routes
 app.get('/', authenticateToken, (req, res) => {
