@@ -55,4 +55,21 @@ wishlists.post('/', authenticateToken, async (req, res) => {
   }
 });
 
+//PUT /wishlists/:id: Modifica una lista dei desideri esistente (autenticazione richiesta).
+wishlists.put('/:listId', authenticateToken, async (req, res) => {
+  const { user_id } = req.body.userData;
+  const { name } = req.body;
+  const { listId } = req.params;
+  const queryString =
+    'UPDATE wishlists SET name=$1, updated_at=NOW() WHERE user_id=$2 AND wishlist_id=$3';
+  const queryValues = [name, user_id, listId];
+  try {
+    await query(queryString, queryValues);
+    res.json({ message: 'Wishlist updated' });
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+
+});
+
 export default wishlists;
