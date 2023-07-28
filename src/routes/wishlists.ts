@@ -1,7 +1,25 @@
-import { Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import { authenticateToken } from './auth';
 import { query } from '../db/db-utility';
 import { v4 as uuidv4 } from 'uuid';
+
+// Utility middleware
+const checkList = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.body.userData;
+  const { wishlist_id } = req.params;
+  const queryString = 'SELECT * FROM wishlists WHERE user_id=$1 AND wishlist_id=$2';
+  const queryValues = [user_id, wishlist_id];
+  try {
+    const { rowCount } = await query(queryString, queryValues);
+    if (rowCount === 0) {
+      res.status(404);
+      throw new Error('List not found');
+    }
+    next();
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+};
 
 const wishlists = Router();
 
@@ -83,12 +101,33 @@ wishlists.delete('/:listId', authenticateToken, async (req, res) => {
 });
 
 // ----------------------- ITEMS ROUTES ----------------------- //
-wishlists.post('/:id/items', authenticateToken, async (req, res) => {
-  const { id: wishlist_id } = req.params;
+// GET /wishlists/:id/items: Ottiene tutti gli elementi della lista dei desideri (autenticazione richiesta).
+// wishlists.get('/:wishlist_id/items', authenticateToken, async (req, res) => {
+//   const { wishlist_id } = req.params;
+//   const { user_id } = req.body.userData;
+//   const queryString = 'SELECT * FROM wishlists WHERE wishlist_id=$1 AND user_id=$2';
+//   const queryValues = [wishlist_id, user_id];
+//   try {
+//     const { rows, rowCount } = await query(queryString, queryValues);
+//     if (rowCount === 0) {
+//       res.status(404);
+//       throw new Error('List not found');
+//     }
+//     const [wishlist] = rows;
+//     res.json(wishlist);
+//   } catch (e) {
+//     res.json({ error_message: (e as Error).message });
+//   }
+// });
+
+wishlists.post('/:wishlist_id/items', authenticateToken, checkList, async (req, res) => {
+  const { wishlist_id } = req.params;
   const { item_name, description } = req.body;
+  const { user_id } = req.body.userData;
   const item_id = uuidv4();
-  const queryString = 'INSERT INTO items(item_id, wishlist_id, item_name, description) VALUES ($1, $2, $3, $4)';
-  const queryValues = [item_id, wishlist_id, item_name, description];
+  const queryString =
+    'INSERT INTO items(item_id, wishlist_id, user_id, item_name, description) VALUES ($1, $2, $3, $4, $5)';
+  const queryValues = [item_id, wishlist_id, user_id, item_name, description];
   try {
     await query(queryString, queryValues);
     res.json({ message: 'Item created' });

@@ -51,7 +51,7 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
 
     if (!wishlistsTableCheck) {
       const wishlistsQuery = `CREATE TABLE Wishlists (
-        wishlist_id UUID PRIMARY KEY',
+        wishlist_id UUID PRIMARY KEY,
         user_id UUID NOT NULL REFERENCES Users(user_id),
         name VARCHAR(255) NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -62,8 +62,9 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
 
     if (!itemsTableCheck) {
       const itemsQuery = `CREATE TABLE Items (
-        item_id UUID PRIMARY KEY',
+        item_id UUID PRIMARY KEY,
         wishlist_id UUID NOT NULL REFERENCES Wishlists(wishlist_id),
+        user_id UUID NOT NULL REFERENCES Users(user_id),
         item_name VARCHAR(255) NOT NULL,
         description TEXT,
         added_at TIMESTAMP NOT NULL DEFAULT NOW(),
