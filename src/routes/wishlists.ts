@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const wishlists = Router();
 
+// ----------------------- WISHLISTS ROUTES ----------------------- //
 wishlists.get('/', authenticateToken, async (req, res) => {
   const { user_id } = req.body.userData;
   const queryString = 'SELECT * FROM wishlists WHERE user_id=$1';
@@ -76,6 +77,21 @@ wishlists.delete('/:listId', authenticateToken, async (req, res) => {
     const { rowCount } = await query(queryString, queryValues);
     if (rowCount === 0) return res.json({ message: 'Nothing to delete' });
     res.json({ message: 'Wishlist deleted' });
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+});
+
+// ----------------------- ITEMS ROUTES ----------------------- //
+wishlists.post('/:id/items', authenticateToken, async (req, res) => {
+  const { id: wishlist_id } = req.params;
+  const { item_name, description } = req.body;
+  const item_id = uuidv4();
+  const queryString = 'INSERT INTO items(item_id, wishlist_id, item_name, description) VALUES ($1, $2, $3, $4)';
+  const queryValues = [item_id, wishlist_id, item_name, description];
+  try {
+    await query(queryString, queryValues);
+    res.json({ message: 'Item created' });
   } catch (e) {
     res.json({ error_message: (e as Error).message });
   }
