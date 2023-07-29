@@ -24,10 +24,12 @@ const checkList = async (req: Request, res: Response, next: NextFunction) => {
 const wishlists = Router();
 
 // ----------------------- WISHLISTS ROUTES ----------------------- //
-wishlists.get('/', authenticateToken, async (req, res) => {
+wishlists.get('/:listId', authenticateToken, async (req, res) => {
+  const { listId } = req.params;
   const { user_id } = req.body.userData;
-  const queryString = 'SELECT * FROM wishlists WHERE user_id=$1';
-  const queryValues = [user_id];
+  const getSingleList = listId !== undefined ? ' AND wishlist_id=$2' : '';
+  const queryString = 'SELECT * FROM wishlists WHERE user_id=$1' + getSingleList;
+  const queryValues = listId !== undefined ? [user_id, listId] : [user_id];
   try {
     const { rows, rowCount } = await query(queryString, queryValues);
     if (rowCount === 0) {
@@ -35,24 +37,6 @@ wishlists.get('/', authenticateToken, async (req, res) => {
       throw new Error('List not found');
     }
     res.json(rows);
-  } catch (e) {
-    res.json({ error_message: (e as Error).message });
-  }
-});
-
-wishlists.get('/:listId', authenticateToken, async (req, res) => {
-  const { listId } = req.params;
-  const { user_id } = req.body.userData;
-  const queryString = 'SELECT * FROM wishlists WHERE wishlist_id=$1 AND user_id=$2';
-  const queryValues = [listId, user_id];
-  try {
-    const { rows, rowCount } = await query(queryString, queryValues);
-    if (rowCount === 0) {
-      res.status(404);
-      throw new Error('List not found');
-    }
-    const [wishlist] = rows;
-    res.json(wishlist);
   } catch (e) {
     res.json({ error_message: (e as Error).message });
   }
