@@ -68,6 +68,7 @@ const checkIfTableExists = async (tableName: string): Promise<boolean> => {
         item_name VARCHAR(255) NOT NULL,
         description TEXT,
         added_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
         is_completed BOOLEAN DEFAULT FALSE
       );`;
       await client.query(itemsQuery);
