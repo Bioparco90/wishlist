@@ -18,3 +18,8 @@ export interface JwtPayload {
 export interface AuthenticatedRequest extends Request {
   user: JwtPayload; // Aggiungi la proprietà "user" al tipo Request
 }
+
+export interface UpdateSetter {
+  setter: string,
+  queryValues: string[]
+}
