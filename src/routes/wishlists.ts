@@ -2,6 +2,21 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { authenticateToken } from './auth';
 import { query } from '../db/db-utility';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateSetter } from '../types/types';
+
+// Utility to setting the UPDATE prepared statement for items table
+const createUpdate = (obj: Object): UpdateSetter => {
+  let constructor = [];
+  let queryValues = [];
+  let index = 1;
+  for (const [key, value] of Object.entries(obj)) {
+    constructor.push(` ${key}=$${index}`);
+    queryValues.push(value);
+    index++;
+  }
+  const setter = constructor.join(',');
+  return { setter, queryValues };
+};
 
 // Utility middleware
 const checkList = async (req: Request, res: Response, next: NextFunction) => {
@@ -115,6 +130,23 @@ wishlists.post('/:wishlist_id/items', authenticateToken, checkList, async (req, 
   try {
     await query(queryString, queryValues);
     res.json({ message: 'Item created' });
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+});
+
+wishlists.put('/:wishlist_id/items/:itemId', authenticateToken, checkList, async (req, res) => {
+  const { wishlist_id, itemId } = req.params;
+  const { userData, ...rest } = req.body;
+  const { setter, queryValues } = createUpdate(rest);
+  const queryString = `UPDATE items SET${setter}, updated_at=NOW() 
+      WHERE wishlist_id=$${queryValues.length + 1} 
+      AND item_id=$${queryValues.length + 2}`;
+
+  queryValues.push(wishlist_id, itemId);
+  try {
+    await query(queryString, queryValues);
+    res.json({ message: 'Item updated' });
   } catch (e) {
     res.json({ error_message: (e as Error).message });
   }
