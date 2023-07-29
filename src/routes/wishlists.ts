@@ -101,24 +101,24 @@ wishlists.delete('/:listId', authenticateToken, async (req, res) => {
 });
 
 // ----------------------- ITEMS ROUTES ----------------------- //
-// GET /wishlists/:id/items: Ottiene tutti gli elementi della lista dei desideri (autenticazione richiesta).
-// wishlists.get('/:wishlist_id/items', authenticateToken, async (req, res) => {
-//   const { wishlist_id } = req.params;
-//   const { user_id } = req.body.userData;
-//   const queryString = 'SELECT * FROM wishlists WHERE wishlist_id=$1 AND user_id=$2';
-//   const queryValues = [wishlist_id, user_id];
-//   try {
-//     const { rows, rowCount } = await query(queryString, queryValues);
-//     if (rowCount === 0) {
-//       res.status(404);
-//       throw new Error('List not found');
-//     }
-//     const [wishlist] = rows;
-//     res.json(wishlist);
-//   } catch (e) {
-//     res.json({ error_message: (e as Error).message });
-//   }
-// });
+// Triggers both "/:wishlist_id/items" and "/:wishlist_id/items/:item_id?"
+wishlists.get('/:wishlist_id/items/:item_id?', authenticateToken, async (req, res) => {
+  const { wishlist_id, item_id } = req.params;
+  const { user_id } = req.body.userData;
+  const getSingleItem = item_id !== undefined ? ' AND item_id=$3' : '';
+  const queryString = 'SELECT * FROM items WHERE wishlist_id=$1 AND user_id=$2' + getSingleItem;
+  const queryValues = item_id !== undefined ? [wishlist_id, user_id, item_id] : [wishlist_id, user_id];
+  try {
+    const { rows, rowCount } = await query(queryString, queryValues);
+    if (rowCount === 0) {
+      res.status(404);
+      throw new Error('Items not found');
+    }
+    res.json(rows);
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+});
 
 wishlists.post('/:wishlist_id/items', authenticateToken, checkList, async (req, res) => {
   const { wishlist_id } = req.params;
