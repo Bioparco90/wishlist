@@ -24,7 +24,7 @@ const checkList = async (req: Request, res: Response, next: NextFunction) => {
 const wishlists = Router();
 
 // ----------------------- WISHLISTS ROUTES ----------------------- //
-wishlists.get('/:listId', authenticateToken, async (req, res) => {
+wishlists.get('/:listId?', authenticateToken, async (req, res) => {
   const { listId } = req.params;
   const { user_id } = req.body.userData;
   const getSingleList = listId !== undefined ? ' AND wishlist_id=$2' : '';
