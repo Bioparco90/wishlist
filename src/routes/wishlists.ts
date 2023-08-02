@@ -152,4 +152,19 @@ wishlists.put('/:wishlist_id/items/:itemId', authenticateToken, checkList, async
   }
 });
 
+// /DELETE /wishlists/:id/items/:itemId: Elimina un elemento esistente dalla lista dei desideri (autenticazione richiesta).
+wishlists.delete('/:wishlist_id/items/:itemId', authenticateToken, async (req, res) => {
+  const { user_id } = req.body.userData;
+  const { wishlist_id, itemId } = req.params;
+  const queryString = 'DELETE FROM items WHERE user_id=$1 AND wishlist_id=$2 AND item_id=$3';
+  const queryValues = [user_id, wishlist_id, itemId];
+  try {
+    const { rowCount } = await query(queryString, queryValues);
+    if (rowCount === 0) return res.json({ message: 'Nothing to delete' });
+    res.json({ message: 'Item deleted' });
+  } catch (e) {
+    res.json({ error_message: (e as Error).message });
+  }
+});
+
 export default wishlists;
